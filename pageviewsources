@@ -14,7 +14,7 @@ Date.prototype.getWeek = function() {
         return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
     }
 
-function getListingCityAndWeek(event) {
+function getListingCityAndWeek(room_visit, event) {
     var listingCity ="none";
     var sanitizedCity = {
       'rotterdam':'Rotterdam','Rotterdam':'Rotterdam','R%C3%B3terdam':'Rotterdam','r%C3%B3terdam':'Rotterdam','schiedam':'Rotterdam','Schiedam':'Rotterdam','Hoogvliet':'Rotterdam','hoogvliet':'Rotterdam','Capelle aan den Ijssel':'Rotterdam','capelle aan den Ijssel':'Rotterdam','Capelle%20aan%20den%20IJssel':'Rotterdam','capelle%20aan%20den%20iJssel':'Rotterdam',
@@ -35,7 +35,7 @@ function getListingCityAndWeek(event) {
       'valencia':'Valencia','Valencia':'Valencia','valÃ¨ncia':'Valencia','ValÃ¨ncia':'Valencia','Castell%C3%B3%20de%20la%20Plana':'Valencia','castell%C3%B3%20de%20la%20plana':'Valencia','Val%c3%a8ncia':'Valencia','val%c3%a8ncia':'Valencia','València':'Valencia','valència':'Valencia','Castell%C3%B3n%20de%20la%20Plana':'Valencia','castell%c3%b3n%20de%20la%20plana':'Valencia',
       'munich': 'Munich', 'Munich': 'Munich','München':'Munich','münchen':'Munich','M%C3%BCnchen':'Munich','m%C3%BCnchen':'Munich','Unterhaching':'Munich','unterhaching':'Munich','M%c3%bcnchen':'Munich','m%c3%bcnchen':'Munich'};
   room_visit = {};
- for (var i = 0; i<event.length; i++){
+  for (var i = 0; i < event.length; i++){
    var e = event[i];
   if (event.name === "Loaded a Page")
   {
@@ -86,7 +86,7 @@ function main() {
     to_date:   params.to_date,
     event_selectors: params.event_selectors,
   })
-  .groupBy([function(event) {return (getListingCityAndWeek(event));}],
+  .groupBy([function(room_visit,event) {return (getListingCityAndWeek(room_visit,event));}],
     function(accumulators, events) {
       var result = {};
       _.each(params.sources, function(sources) {result[sources] = 0;});
