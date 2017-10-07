@@ -15,7 +15,6 @@ Date.prototype.getWeek = function() {
     }
 
 function getListingCityAndWeek(event) {
-  
     var listingCity ="none";
     var sanitizedCity = {
       'rotterdam':'Rotterdam','Rotterdam':'Rotterdam','R%C3%B3terdam':'Rotterdam','r%C3%B3terdam':'Rotterdam','schiedam':'Rotterdam','Schiedam':'Rotterdam','Hoogvliet':'Rotterdam','hoogvliet':'Rotterdam','Capelle aan den Ijssel':'Rotterdam','capelle aan den Ijssel':'Rotterdam','Capelle%20aan%20den%20IJssel':'Rotterdam','capelle%20aan%20den%20iJssel':'Rotterdam',
@@ -36,47 +35,47 @@ function getListingCityAndWeek(event) {
       'valencia':'Valencia','Valencia':'Valencia','valÃ¨ncia':'Valencia','ValÃ¨ncia':'Valencia','Castell%C3%B3%20de%20la%20Plana':'Valencia','castell%C3%B3%20de%20la%20plana':'Valencia','Val%c3%a8ncia':'Valencia','val%c3%a8ncia':'Valencia','València':'Valencia','valència':'Valencia','Castell%C3%B3n%20de%20la%20Plana':'Valencia','castell%c3%b3n%20de%20la%20plana':'Valencia',
       'munich': 'Munich', 'Munich': 'Munich','München':'Munich','münchen':'Munich','M%C3%BCnchen':'Munich','m%C3%BCnchen':'Munich','Unterhaching':'Munich','unterhaching':'Munich','M%c3%bcnchen':'Munich','m%c3%bcnchen':'Munich'};
   room_visit = {};
-  for (var i=0; i<event.length; i++){
-    var e = event[i];
-  }
+ for (var i = 0; i<event.length; i++){
+   var e = event[i];
   if (event.name === "Loaded a Page")
   {
-   var month = (new Date(event.time).toISOString()).split('T')[0].split('-')[1];
+    var month = (new Date(event.time).toISOString()).split('T')[0].split('-')[1];
     var year = (new Date(event.time).toISOString()).split('T')[0].split('-')[0];
     var week = (new Date(event.time)).getWeek();
     var YearWeek = year + '-' + week;
-  if(room_visit[sanitizedCity[listingCity]])
-  {
-    if (room_visit[sanitizedCity[listingCity]][YearWeek])
+    if(i + 1 < event.length)  
     {
-  
-  if (event.properties.$current_url.includes("/room/"))
+    if (room_visit[sanitizedCity[listingCity]])
       {
-        var roomPos = event.properties.$current_url.indexOf("/room/", 0);
-        var idPos = event.properties.$current_url.indexOf("/", roomPos + 1);
-        var countryPos = event.properties.$current_url.indexOf("/", idPos + 1);
-        var cityPos = event.properties.$current_url.indexOf("/", countryPos + 1);
-        var streetPos = event.properties.$current_url.indexOf("/", cityPos + 1);
-        listingCity = event.properties.$current_url.substring(cityPos + 1, streetPos);
-        room_visit[sanitizedCity[listingCity]][YearWeek]++;
-    }
-    if (event.properties.$current_url.includes("/s/"))
-      {
-      var citySearch = event.properties.$current_url.indexOf("/s/", 0);
-      var countrySearch = event.properties.$current_url.indexOf("/",citySearch + 1,"--");
-      listingCity = event.properties.$current_url.substring(citySearch + 1, countrySearch);
-      room_visit[sanitizedCity[listingCity]][YearWeek]++;
-        
-      }
-   }
+        if(room_visit[sanitizedCity[listingCity]][YearWeek])
+        {
+         if (event.properties.$current_url.includes("/room/"))
+          {
+          var roomPos = event.properties.$current_url.indexOf("/room/", 0);
+          var idPos = event.properties.$current_url.indexOf("/", roomPos + 1);
+          var countryPos = event.properties.$current_url.indexOf("/", idPos + 1);
+          var cityPos = event.properties.$current_url.indexOf("/", countryPos + 1);
+          var streetPos = event.properties.$current_url.indexOf("/", cityPos + 1);
+          listingCity = event.properties.$current_url.substring(cityPos + 1, streetPos);
+          room_visit[sanitizedCity[listingCity]][YearWeek]++;  
+          } 
+        if (event.properties.$current_url.includes("/s/"))
+          {
+          var citySearch = event.properties.$current_url.indexOf("/s/", 0);
+          var countrySearch = event.properties.$current_url.indexOf("/",citySearch + 1,"--");
+          listingCity = event.properties.$current_url.substring(citySearch + 1, countrySearch);
+          room_visit[sanitizedCity[listingCity]][YearWeek]++;
+          }
+        }
   else
-  {
+    {
     listingCity = String(event.properties.listingCity);
     room_visit[sanitizedCity[listingCity]][YearWeek]++;
-    
+    }
   }
+} 
 }
-}
+ }  
   return room_visit;
 }
 
