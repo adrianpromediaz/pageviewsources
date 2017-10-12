@@ -1,0 +1,109 @@
+var params = {
+  from_date: '2017-06-01',
+  to_date: '2017-08-31',
+  event_selectors: [
+       {event: 'Loaded a Page', selector:'(defined (properties["$current_url"])) and (("/s" in properties["current_url"]) or ("/room" in properties["$current_url"]))  '},
+    ]
+  
+};
+Date.prototype.getWeek = function() {
+        var onejan = new Date(this.getFullYear(), 0, 1);
+        return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+    };
+function getWeek(event) {
+  var month = (new Date(event.time).toISOString()).split('T')[0].split('-')[1];
+  var year = (new Date(event.time).toISOString()).split('T')[0].split('-')[0];
+  var week = (new Date(event.time)).getWeek();
+  var YearWeek = year + '-' + week;
+  return YearWeek;
+  
+}
+
+function getSources(event)
+{
+  var sources = "none";
+  var sanitizedSources = {'Direct':'Facebook','Facebook':'Facebook'};
+   sources = String(event.properties.Sources);
+     if (event.name == "Loaded a Page")
+  {
+      if (event.properties.Sources== "facebook")
+          {
+          sources = "Facebook";
+           } 
+        if (event.properties.Sources == "Facebook")
+          {
+          sources = "Facebook";
+          }
+        }
+  else
+    {
+    sources = String(event.properties.Sources);
+    }  
+   return [sanitizedSources[event.properties.Sources]];
+}
+
+function getListingCityAndWeek(event) {
+    var listingCity ="none";
+    var sanitizedCity = {
+      'rotterdam':'Rotterdam','Rotterdam':'Rotterdam','R%C3%B3terdam':'Rotterdam','r%C3%B3terdam':'Rotterdam','schiedam':'Rotterdam','Schiedam':'Rotterdam','Hoogvliet':'Rotterdam','hoogvliet':'Rotterdam','Capelle aan den Ijssel':'Rotterdam','capelle aan den Ijssel':'Rotterdam','Capelle%20aan%20den%20IJssel':'Rotterdam','capelle%20aan%20den%20iJssel':'Rotterdam',
+      'barcelona':'Barcelona','Barcelona':'Barcelona','Cerdanyola del Vallès':'Barcelona','cerdanyola del vallès':'Barcelona','L\'Hospitalet de Llobregat':'Barcelona','Santa%20Coloma%20de%20Gramenet':'Barcelona','santa%20coloma%20de%20gramenet':'Barcelona','L\'Hospitalet%20de%20Llobregat':'Barcelona','l\'hospitalet%20de%20llobregat':'Barcelona','Montcada%20i%20Reixac':'Barcelona','montcada%20i%20reixac':'Barcelona','Cerdanyola del vallès':'Barcelona','cerdanyola del Vallès':'Barcelona','L%27Hospitalet%20de%20Llobregat':'Barcelona','l%27hospitalet%20de%20llobregat':'Barcelona',
+      'wien':'Vienna','Wien':'Vienna','vienna':'Vienna','Vienna':'Vienna','wenen':'Vienna','Wenen':'Vienna','Graz':'Vienna','graz':'Vienna',
+      'utrecht':'Utrecht','Utrecht':'Utrecht','Zeist':'Utrecht','zeist':'Utrecht','Nieuwegein':'Utrecht','nieuwegein':'Utrecht','Maarssen':'Utrecht','maarssen':'Utrecht','Abcoude':'Utrecht','abcoude':'Utrecht','Tienhoven':'Utrecht','tienhoven':'Utrecht',
+      'madrid':'Madrid','Madrid':'Madrid','Fuenlabrada':'Madrid','fuenlabrada':'Madrid','Alcorc%C3%B3n':'Madrid','alcorc%C3%B3n':'Madrid','Pozuelo%20de%20Alarc%C3%B3n':'Madrid','pozuelo%20de%20Alarc%C3%B3n':'Madrid',
+      'delft':'Delft','Delft':'Delft','den-haag':'Delft','Den-haag':'Delft','the-hague':'Delft','The-Hague':'Delft','den Haag':'Delft','Den Haag':'Delft','the hague':'Delft','The Hague':'Delft','den%20haag':'Delft','Den%20Haag':'Delft','the%20hague':'Delft','The%20Hague':'Delft','rijswijk':'Delft','Rijswijk':'Delft','voorburg':'Delft','Voorburg':'Delft',
+      'leiden':'Leiden','Leiden':'Leiden','hazerswoude':'Leiden','Hazerswoude':'Leiden','Leiderdorp':'Leiden','leiderdorp':'Leiden','Leidschendam':'Leiden','leidschendam':'Leiden',
+      'gothenburg':'Gothenburg','Gothenburg':'Gothenburg','g%C3%B6teborg':'Gothenburg','G%C3%B6teborg':'Gothenburg','Göteborg':'Gothenburg','göteborg':'Göteborg','Angered':'Gothenburg','angered':'Gothenburg','V%C3%A4stra%20Fr%C3%B6lunda':'Gothenburg','v%c3%a4stra%20fr%c3%b6lunda':'Gothenburg','M%C3%B6lndal':'Gothenburg','m%C3%b6lndal':'Gothenburg','G%c3%b6teborg':'Gothenburg','g%c3%b6teborg':'Gothenburg','S%C3%A4vedalen':'Gothenburg','s%c3%a4vedalen':'Gothenburg',
+      'berlin':'Berlin','Berlin':'Berlin','Glienicke':'Berlin','glienicke':'Berlin',
+      'florence':'Florence','Florence':'Florence','firenze':'Florence','Firenze':'Florence',
+      'milan':'Milan','Milan':'Milan','milano':'Milan','Milano':'Milan','Sesto San Giovanni':'Milan','sesto san giovanni':'Milan','Sesto%20San%20Giovanni':'Milan','sesto%20san%20giovanni':'Milan',
+      'brussels':'Brussels','Brussels':'Brussels','Brussel':'Brussels','brussel':'Brussels','bruxelles':'Brussels','Bruxelles':'Brussels','Schaerbeek':'Brussels','schaerbeek':'Brussels','Saint-Josse-ten-Noode':'Brussels','saint-Josse-ten-noode':'Brussels','Ixelles':'Brussels','ixelles':'Brussels','Etterbeek':'Brussels','etterbeek':'Brussels','Saint-Gilles':'Brussels','saint-Gilles':'Brussels','Molenbeek-Saint-Jean':'Brussels','molenbeek-saint-jean':'Brussels','Uccle':'Brussels','uccle':'Brussels','Elsene':'Brussels','elsene':'Brussels','Brussels%20Hoofdstedelijk%20Gewest':'Brussels','brussels%20hoofdstedelijk%20gewest':'Brussels','Watermael-Boitsfort':'Brussels','watermael-boitsfort':'Brussels','Woluwe-Saint-Lambert':'Brussels','woluwe-saint-lambert':'Brussels','Auderghem':'Brussels','auderghem':'Brussels','Vorst':'Brussels','vorst':'Brussels','Woluwe-Saint-Pierre':'Brussels','woluwe-saint-pierre':'Brussels','Wezembeek-Oppem':'Brussels','wezembeek-oppem':'Brussels',
+      'berkeley':'Berkeley','Berkeley':'Berkeley',
+      'helsinki':'Helsinki','Helsinki':'Helsinki','Espoo':'Helsinki','espoo':'Helsinki','Vantaa':'Helsinki','vantaa':'Helsinki',
+      'pisa':'Pisa','Pisa':'Pisa',
+      'valencia':'Valencia','Valencia':'Valencia','valÃ¨ncia':'Valencia','ValÃ¨ncia':'Valencia','Castell%C3%B3%20de%20la%20Plana':'Valencia','castell%C3%B3%20de%20la%20plana':'Valencia','Val%c3%a8ncia':'Valencia','val%c3%a8ncia':'Valencia','València':'Valencia','valència':'Valencia','Castell%C3%B3n%20de%20la%20Plana':'Valencia','castell%c3%b3n%20de%20la%20plana':'Valencia',
+      'munich': 'Munich', 'Munich': 'Munich','München':'Munich','münchen':'Munich','M%C3%BCnchen':'Munich','m%C3%BCnchen':'Munich','Unterhaching':'Munich','unterhaching':'Munich','M%c3%bcnchen':'Munich','m%c3%bcnchen':'Munich'};
+  var room_visit = {};
+  
+  if (event.name === "Loaded a Page")
+  {
+      if (event.properties.$current_url.includes("/room/"))
+          {
+          var roomPos = event.properties.$current_url.indexOf("/room/", 0);
+          var idPos = event.properties.$current_url.indexOf("/", roomPos + 1);
+          var countryPos = event.properties.$current_url.indexOf("/", idPos + 1);
+          var cityPos = event.properties.$current_url.indexOf("/", countryPos + 1);
+          var streetPos = event.properties.$current_url.indexOf("/", cityPos + 1);
+          listingCity = event.properties.$current_url.substring(cityPos + 1, streetPos);
+           
+          } 
+        if (event.properties.$current_url.includes("/s/"))
+          {
+          var citySearch = event.properties.$current_url.indexOf("/s/", 0);
+          var countrySearch = event.properties.$current_url.indexOf("/",citySearch + 1,"--");
+          listingCity = event.properties.$current_url.substring(citySearch + 1, countrySearch);
+          }
+        }
+  else
+    {
+    listingCity = String(event.properties.listingCity);
+  
+  }
+  return sanitizedCity[listingCity];
+}
+function main() {
+  return Events
+  ({
+    from_date: params.from_date,
+    to_date:   params.to_date,
+    event_selectors: params.event_selectors,
+  })
+  
+   .groupBy([
+    function(event) {return (getListingCityAndWeek(event))},
+    function(event) {return (getWeek(event))},
+    function(event) {return (getSources(event));}, 
+   
+    ],
+    mixpanel.reducer.count()
+    );
+}
